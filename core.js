@@ -69,6 +69,53 @@ Object.prototype.extend = function (parentObj) {
   return newObj;
 };
 
+/*
+*定义一个函数Class，用来定义一个类
+*第一个参数是一个对象，包含定义类的内容，包括：
+*1，构造函数_constructor
+*2，原型方法列表
+*第二个参数可选，表示父类构造函数,缺省就是Object
+*返回值是子类构造函数
+*/
+var Class=(function(){
+   //共享的临时构造函数，避免每次继承都使用不同的临时
+   //构造函数，多耗费点内存
+    var  F=function(){};
+    //子类构造函数
+    var Child=function(def,parent){
+        //调用父类的构造函数
+        if(Child.parent&&Child.parent.hasOwnProperty("_constructor"))
+          {
+           Child.parent.apply(this,arguments);
+          }
+         //调用子类的构造函数
+        if(Child.prototype.hasOwnProperty("_constructor"))
+          {
+            Child.prototype._constructor.apply(this,arguments);
+          }
+      };
+
+        //继承
+       parent=parent || Object;
+       F.prototype=parent.prototype;
+       Child.prototype=new F();
+       //保存父类的原型
+       Child.parent=parent.prototype;
+       //修改构造函数指针
+       Child.prototype.constructor=Child;
+
+       //添加原型方法，包括了构造函数
+        for(var key in def)
+          {
+           if(def.hasOwnProperty(key)
+             {
+                  Object.defineProperty(Child.prototype, key, Object.getOwnPropertyDescriptor(def, key))
+             }
+          }
+
+          //返回新的Class
+            return Child;
+})();
 
 /*
 * 跨平台的优化的requestAnimationFrame函数和cancelRequestAnimationFrame函数
