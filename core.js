@@ -81,19 +81,17 @@ var Class=(function(){
    //共享的临时构造函数，避免每次继承都使用不同的临时
    //构造函数，多耗费点内存
     var  F=function(){};
-    //子类构造函数
+    //如果没有定义构造函数，生成子类构造函数
     var Child=function(def,parent){
         //调用父类的构造函数
         if(Child.parent&&Child.parent.hasOwnProperty("_constructor"))
           {
            Child.parent.apply(this,arguments);
-          }
-         //调用子类的构造函数
-        if(Child.prototype.hasOwnProperty("_constructor"))
-          {
-            Child.prototype._constructor.apply(this,arguments);
-          }
+          }     
+        
       };
+        //新的构造函数，如果def包含构造函数，直接返回
+         Child=def._constructor || Child;
 
         //继承
        parent=parent || Object;
@@ -114,7 +112,7 @@ var Class=(function(){
           }
 
           //返回新的Class
-            return Child;
+           return Child;
 })();
 
 /*
