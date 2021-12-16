@@ -5,9 +5,12 @@
  * @date  2021/4/12
 
  */
-'use  strict';
+'use  strict';//严格模式
 
-var j2d = {};
+/*定义一个命名空间函数*/
+var $$ = function(){};
+
+
 /*
 * 定义:extend,用于类继承
 * 参数:父类型
@@ -103,5 +106,5 @@ Object.prototype.extend = function (parentObj) {
 }());
 
   //密封
-  Object.freeze(j2d);
+  Object.freeze($$);
 }());
