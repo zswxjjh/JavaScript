@@ -105,9 +105,9 @@ var Class=(function(){
        //添加原型方法，包括了构造函数
         for(var key in def)
           {
-           if(def.hasOwnProperty(key)
+           if(def.hasOwnProperty(key)&&key!=="_constructor")
              {
-                  Object.defineProperty(Child.prototype, key, Object.getOwnPropertyDescriptor(def, key))
+                 Child.prototype[key]=def[key];
              }
           }
 
