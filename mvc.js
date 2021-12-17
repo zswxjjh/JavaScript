@@ -44,3 +44,12 @@ var Event=(function(){
        }
    };
 }());
+
+/*
+*抽象监听者类：用于监听器模式
+*/
+var Listener=(function(){
+    var F=function(){};
+    F.prototype.update=function(){};
+    return F;
+  }());
