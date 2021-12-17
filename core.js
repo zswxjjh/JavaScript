@@ -77,12 +77,12 @@ Object.prototype.extend = function (parentObj) {
 *第二个参数可选，表示父类构造函数,缺省就是Object
 *返回值是子类构造函数
 */
-var Class=(function(){
+var Class=function(def,parent){
    //共享的临时构造函数，避免每次继承都使用不同的临时
    //构造函数，多耗费点内存
     var  F=function(){};
     //如果没有定义构造函数，生成子类构造函数
-    var Child=function(def,parent){
+    var Child=function(){
         //调用父类的构造函数
         if(Child.parent&&Child.parent.hasOwnProperty("_constructor"))
           {
@@ -113,7 +113,7 @@ var Class=(function(){
 
           //返回新的Class
            return Child;
-})();
+};
 
 /*
 * 跨平台的优化的requestAnimationFrame函数和cancelRequestAnimationFrame函数
