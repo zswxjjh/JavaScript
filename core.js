@@ -152,4 +152,4 @@ var Class=function(def,parent){
 
   //密封
   Object.freeze($$);
-}());
+
