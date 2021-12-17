@@ -49,7 +49,41 @@ var Event=(function(){
 *抽象监听者类：用于监听器模式
 */
 var Listener=(function(){
-    var F=function(){};
-    F.prototype.update=function(){};
-    return F;
+    var Listener=function(){};
+    Listener.prototype.update=function(){};
+    return Listener;
   }());
+
+/*
+*抽象模型类，实现基本功能，负责业务逻辑
+*/
+var  Model=(function(){
+   //构造函数
+   function Model()
+    {
+      this.items={};
+      
+    }
+   /*
+    *基本的CRUD操作
+   */
+    Model.prototype.add=function(item,key)
+      {
+        this.items[key]=item;
+      };
+
+    Model.prototype.remove=function(key)
+      {
+        delete this.items[key];
+      };
+
+    Model.prototype.get=function(key)
+      {
+        return this.items[key];
+      };
+
+    Model.prototype.update=function(item,key)
+      {
+        this.items[key]=item;
+      };
+ }());
