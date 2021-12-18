@@ -56,30 +56,58 @@ var Listener=(function(){
 
 /*
 *抽象模型类，实现基本功能，负责业务逻辑
+*表示表格数据
 */
 var  Model=(function(){
-   //构造函数
-   function Model()
+   //构造函数，key表示主键字段
+   function Model(key)
     {
-      this.items={};
-      
+      //存储表格数据
+      this.items=[];
+      this.key=key;
     }
    /*
-    *基本的CRUD操作
+    *追加一个或者多个记录数据
    */
-    Model.prototype.add=function(item,key)
+    Model.prototype.add=function()
       {
-        this.items[key]=item;
+        for(var i=0;i<arguments.length;i++)
+         {
+          this.items.push(arguments[i]);
+         }
       };
-
-    Model.prototype.remove=function(key)
+    /*
+     *删除一个或者多个记录
+     */
+    Model.prototype.remove=function()
       {
-        delete this.items[key];
+        var key=this.key;
+        for(var i=0;i<arguments.length;i++)
+         {
+          if(arguments[i][key]===)
+          this.items.(arguments[i]);
+         }
       };
-
-    Model.prototype.get=function(key)
+    /*
+     *查询一条或者多条记录
+     */
+    Model.prototype.get=function()
       {
-        return this.items[key];
+        var result=[];
+        for(var i=0;i<this.items.length;i++)
+          {
+           var item=this.items[i];
+           var key=item[this.key];
+           for(var j=0;j<arguments.length;j++)
+            {
+              if(key===arguments[j])
+                {
+                 result.push(item);
+                 break;
+                }
+            }
+          }
+        return  result;
       };
 
     Model.prototype.update=function(item,key)
