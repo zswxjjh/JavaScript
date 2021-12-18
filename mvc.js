@@ -65,9 +65,14 @@ var  Model=(function(){
       //存储表格数据
       this.items=[];
       this.key=key;
+      //事件
+      this.onAdd=new Event();
+      this.onRemove=new Event();
+      this.onGet=new Event();
+      this.onUpdate=new Event();
     }
    /*
-    *追加一个或者多个记录数据
+    *追加一个或者多个记录数据，可变参数，item集合
    */
     Model.prototype.add=function()
       {
@@ -75,21 +80,36 @@ var  Model=(function(){
          {
           this.items.push(arguments[i]);
          }
+         //触发事件    
+          this.onAdd.notify({source:this,values:arguments});
       };
     /*
-     *删除一个或者多个记录
+     *删除一个或者多个记录，可变参数，key集合
      */
     Model.prototype.remove=function()
       {
+        var values=this.get(arguments);
         var key=this.key;
-        for(var i=0;i<arguments.length;i++)
+        var items=this.items;
+        for(var i=0;i<values.length;i++)
          {
-          if(arguments[i][key]===)
-          this.items.(arguments[i]);
+           for(var j=0;j<items.length;)
+              {
+                //考虑items.length是易变的
+                if(values[i][key]===items[j][key])
+                  {
+                  items.splice(j,1);
+                  break;
+                  }
+                else
+                  j++;
+              }
          }
+         //触发事件
+          this.onRemove.notify({source:this,values:arguments});
       };
     /*
-     *查询一条或者多条记录
+     *查询一条或者多条记录，可变参数，key集合
      */
     Model.prototype.get=function()
       {
@@ -109,9 +129,25 @@ var  Model=(function(){
           }
         return  result;
       };
-
-    Model.prototype.update=function(item,key)
+    /*
+     *更新一条或者多条记录，可变参数,item集合
+     */
+    Model.prototype.update=function()
       {
-        this.items[key]=item;
+        var key=this.key;
+        var items=this.items;
+        for(var i=0;i<arguments.length;i++)
+         {
+           for(var j=0;j<items.length;j++)
+              {              
+                if(arguments[i][key]===items[j][key])               
+                  {
+                  items[j]=arguments[i];
+                  break;
+                  }                
+              }
+         }
+          //
+          this.onUpdate.notify({source:this,values:arguments});
       };
  }());
