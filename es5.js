@@ -10,6 +10,48 @@
 /*定义一个命名空间函数*/
 var $$ = function(){};
 
+/*
+ *克隆对象里面自定义的属性，参数是一个
+ *或者多个对象，返回一个新对象
+ */
+function  deepClone()
+{
+  var  newObj={};
+  for(var i=0;i<arguments.length;i++)
+     {
+       var obj=arguments[i];
+      //获取所有非原型的属性集合名，包括
+     //不可枚举的属性
+       var names=Object.getOwnPropertyNames(obj);
+       for(var j=0;j<names.length;j++)
+         {
+          var  key=names[j];
+          var  value=obj[key];
+          //属性值是对象类型
+          if(value instanceof  Object)
+            {               
+            newObj[key]=deepClone(value);
+            }
+         //属性值是数组类型
+         else if(value instanceof  Array) 
+            {
+               var array=newObj[key]=[];
+               for(var n=0;n<value.length;n++)
+             {
+               var val=value[n];
+               //元素值是对象
+               if(val instanceof  Object)                
+                   array.push(deepClone(val));                
+              else                
+                   array.push(val);                
+             }
+            }
+          else//基本类型或者函数类型
+              newObj[key]=value;         
+         }
+     }
+   return   newObj;
+}
 
 /*
 * 定义:extend,用于类继承
