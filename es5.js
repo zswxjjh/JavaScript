@@ -54,6 +54,27 @@ function  deepClone()
 }
 
 /*
+ *工具函数：对象继承
+ *@param son:表示儿子对象
+ *@param parent:表示父亲对象
+ *@return 新的儿子对象
+ */
+function  extend(son,parent)
+{
+   /*为了让新对象复制儿子对象中已有的属性，我们需要改造son
+     *使其具有这种形式:{a:属性描述符对象,b:属性描述符对象}
+     *注意Object.getOwnPropertyNames(son)返回所有自有(非继承)属性，包括不可枚举的
+     */
+    var names = Object.getOwnPropertyNames(son);
+    var obj={};//复制son的临时对象
+    for (var i = 0; i < names.length; i++) {
+       obj[names[i]]=Object.getOwnPropertyDescriptor(son, names[i]);
+    }
+    //创建新的对象，以parent作为原型
+    return Object.create(parent,obj);   
+}
+
+/*
 * 定义:extend,用于类继承
 * 参数:父类型
 * 返回值：升级版的子类,比如:A'=A.extend(B);
@@ -61,17 +82,7 @@ function  deepClone()
 Function.prototype.extend = function (parent) {
   var p = parent || Object;
   if (typeof p === 'function') {
-    /*为了让新的原型对象复制this.prototype对象中已有的属性，我们需要改造this.prototype
-     *使其具有这种形式:{a:属性描述符对象,b:属性描述符对象}
-     *注意Object.getOwnPropertyNames(this.prototype)返回所有自有(非继承)属性，包括不可枚举的
-     */
-    var names = Object.getOwnPropertyNames(this.prototype);
-    var obj={};//复制this.prototype的临时对象
-    for (var i = 0; i < names.length; i++) {
-       obj[names[i]]=Object.getOwnPropertyDescriptor(this.prototype, names[i]);
-    }
-    //创建新的原型对象，以parent的原型或者Object原型作为原型
-    var prototype = Object.create(p.prototype,obj);
+    var prototype=extend(this.prototype,p.prototype);
     //保存父类的原型
     this._super=p.prototype;
     //修改原型的constructor属性，为this
@@ -90,18 +101,23 @@ Function.prototype.extend = function (parent) {
  *返回值：升级版的子类,比如:A'=A.implement(B).implement(C);
  */
 Function.prototype.implement = function (parent) {
-  var p = parent || Object;
-  //p是一个对象
-    var son,father;
-    var F;
-  if(typeof p==='object')
+  /*
+   *在当前原型链上插入一个节点，位于this原型的前面
+   */
+    var son/*儿子*/,father/*父亲*/;
+    var F/构造函数*/;
+  if(typeof parent==='object')
     {
+     //没有构造函数，指定一个构造函数  
      F=function(){};
-     p.constructor=F;
-     F.prototype=p;
+     //修改对象的构造函数
+     parent.constructor=F;
+     //把对象作为构造函数的原型
+     F.prototype=parent;
     }
-  else if(typeof p === 'function') {
-    F=p;
+  else if(typeof parent === 'function') {
+    //参数就是构造函数
+    F=parent;
     }  
     son=F;
     father=this._super;
@@ -155,15 +171,7 @@ Object.prototype.extend = function (parentObj) {
   if (typeof parentObj !== 'object') {
     throw new TypeError('参数必须是对象!');
   }
-  //以parentObj作为原型创建一个空对象
-  var newObj = Object.create(parentObj);
-  //返回所有的自有的对象属性名，包括不可枚举的
-  var names = Object.getOwnPropertyNames(this);
-  for (var i = 0; i < names.length; i++) {
-    //var value=this[names[i]];
-    Object.defineProperty(newObj, names[i], Object.getOwnPropertyDescriptor(this,names[i]));
-  }
-  return newObj;
+    return extend(this,parentObj); 
 };
 
 /*
