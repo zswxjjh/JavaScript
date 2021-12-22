@@ -108,38 +108,22 @@ Function.prototype.implement = function (parent) {
     var F/构造函数*/;
   if(typeof parent==='object')
     {
-     //没有构造函数，指定一个构造函数  
-     F=function(){};
-     //修改对象的构造函数
-     parent.constructor=F;
-     //把对象作为构造函数的原型
-     F.prototype=parent;
+      var prototype=extend(parent,this._super); 
+      this._super=prototype;
+      prototype=extend(this.prototype,prototype);
+      prototype.constructor=this;
+      this.prototype=prototype; 
     }
   else if(typeof parent === 'function') {
-    //参数就是构造函数
-    F=parent;
-    }  
-    son=F;
-    father=this._super;
-    father=son.extend(father);
-    //保存父类的原型
-    this._super=father;
-    father=new father();
-    son=this.prototype;
-    var names = Object.getOwnPropertyNames(this.prototype);
-    var obj={};//复制this.prototype的临时对象
-    for (var i = 0; i < names.length; i++) {
-       obj[names[i]]=Object.getOwnPropertyDescriptor(this.prototype, names[i]);
-    }
-    //创建新的原型对象，以parent的原型或者Object原型作为原型
-    var prototype = Object.create(father,obj);  
-    //修改原型的constructor属性，为this
-    prototype.constructor = this;
-    this.prototype = prototype;
-    return this;
+      var prototype=extend(parent.prototype,this._super);
+      this._super=prototype;
+      prototype=extend(this.prototype,prototype);
+      prototype.constructor=this;
+      this.prototype=prototype;
   } else {
     throw  new TypeError('参数：' + p + '类型不合法!');
   }
+      return this;
 };
 
 
