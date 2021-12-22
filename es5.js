@@ -75,7 +75,7 @@ Function.prototype.extend = function (parent) {
 /*
 * 在函数原型里绑定方法
 * */
-Function.prototype.$bind = function (name, func) {
+Function.prototype.method = function (name, func) {
   if (!this.prototype.hasOwnProperty(name)) {
     this.prototype[name] = func;
   }
