@@ -61,8 +61,19 @@ function  deepClone()
 Function.prototype.extend = function (parent) {
   var p = parent || Object;
   if (typeof p === 'function') {
+    /*为了让新的原型对象复制this.prototype对象中已有的属性，我们需要改造this.prototype
+     *使其具有这种形式:{a:属性描述符对象,b:属性描述符对象}
+     *注意Object.getOwnPropertyNames(this.prototype)返回所有自有(非继承)属性，包括不可枚举的
+     */
+    var names = Object.getOwnPropertyNames(this.prototype);
+    var obj={};//复制this.prototype的临时对象
+    for (var i = 0; i < names.length; i++) {
+       obj[names[i]]=Object.getOwnPropertyDescriptor(this.prototype, names[i]);
+    }
     //创建新的原型对象，以parent的原型或者Object原型作为原型
-    var prototype = Object.create(p.prototype);
+    var prototype = Object.create(p.prototype,obj);
+    //保存父类的原型
+    this._super=p.prototype;
     //修改原型的constructor属性，为this
     prototype.constructor = this;
     this.prototype = prototype;
@@ -71,6 +82,50 @@ Function.prototype.extend = function (parent) {
     throw  new TypeError('参数：' + p + '类型不合法!');
   }
 };
+
+/*
+ *实现接口的方法，参数是接口类型:
+ *1:对象表示法，匿名接口，例如{update:null/*抽象方法*/，get:function(){}/*default方法*/}
+ *2:函数表示法，function(){定义原型方法}
+ *返回值：升级版的子类,比如:A'=A.implement(B).implement(C);
+ */
+Function.prototype.implement = function (parent) {
+  var p = parent || Object;
+  //p是一个对象
+    var son,father;
+    var F;
+  if(typeof p==='object')
+    {
+     F=function(){};
+     p.constructor=F;
+     F.prototype=p;
+    }
+  else if(typeof p === 'function') {
+    F=p;
+    }  
+    son=F;
+    father=this._super;
+    father=son.extend(father);
+    //保存父类的原型
+    this._super=father;
+    father=new father();
+    son=this.prototype;
+    var names = Object.getOwnPropertyNames(this.prototype);
+    var obj={};//复制this.prototype的临时对象
+    for (var i = 0; i < names.length; i++) {
+       obj[names[i]]=Object.getOwnPropertyDescriptor(this.prototype, names[i]);
+    }
+    //创建新的原型对象，以parent的原型或者Object原型作为原型
+    var prototype = Object.create(father,obj);  
+    //修改原型的constructor属性，为this
+    prototype.constructor = this;
+    this.prototype = prototype;
+    return this;
+  } else {
+    throw  new TypeError('参数：' + p + '类型不合法!');
+  }
+};
+
 
 /*
 * 在函数原型里绑定方法
@@ -102,11 +157,11 @@ Object.prototype.extend = function (parentObj) {
   }
   //以parentObj作为原型创建一个空对象
   var newObj = Object.create(parentObj);
-  //返回所有的自有的对象属性名
+  //返回所有的自有的对象属性名，包括不可枚举的
   var names = Object.getOwnPropertyNames(this);
   for (var i = 0; i < names.length; i++) {
     //var value=this[names[i]];
-    Object.defineProperty(newObj, names[i], Object.getOwnPropertyDescriptor(this, names[i]))
+    Object.defineProperty(newObj, names[i], Object.getOwnPropertyDescriptor(this,names[i]));
   }
   return newObj;
 };
