@@ -76,7 +76,7 @@ function  extend(son,parent)
 
 /*
 * 定义:extend,用于类继承
-* 参数:父类型
+* 参数:父类型，可以是对象或者构造函数
 * 返回值：升级版的子类,比如:A'=A.extend(B);
 * */
 Function.prototype.extend = function (parent) {
@@ -85,6 +85,15 @@ Function.prototype.extend = function (parent) {
      throw new Error("超类已经存在，不可重复继承！");
     }
   var Parent = parent || Object;
+  //父类是个object
+  if(typeof Parent==="object")
+    {
+     //临时函数
+     var F=function(){};
+     F.prototype=Parent;
+     F.prototype.constructor=F;
+     Parent=F;
+    }
   if (typeof Parent === 'function') {
   //生成升级版的子类构造函数
     var Child=function(){
@@ -115,40 +124,6 @@ Function.prototype.extend = function (parent) {
     throw  new TypeError('参数：' + p + '类型不合法!');
   }
 };
-
-/*
- *实现接口的方法，参数是接口类型:
- *1:对象表示法，匿名接口，例如{update:null/*抽象方法*/，get:function(){}/*default方法*/}
- *2:函数表示法，function(){定义原型方法}
- *返回值：升级版的子类,比如:A'=A.implement(B，C);
- */
-Function.prototype.implement = function () {
-    for(var i=0;i<arguments.length;i++)
-     {
-      
-     }
-    var son/*儿子*/,father/*父亲*/;
-    var F/构造函数*/;
-  if(typeof parent==='object')
-    {
-      var prototype=extend(parent,this._super); 
-      this._super=prototype;
-      prototype=extend(this.prototype,prototype);
-      prototype.constructor=this;
-      this.prototype=prototype; 
-    }
-  else if(typeof parent === 'function') {
-      var prototype=extend(parent.prototype,this._super);
-      this._super=prototype;
-      prototype=extend(this.prototype,prototype);
-      prototype.constructor=this;
-      this.prototype=prototype;
-  } else {
-    throw  new TypeError('参数：' + p + '类型不合法!');
-  }
-      return this;
-};
-
 
 /*
 * 在函数原型里绑定方法
