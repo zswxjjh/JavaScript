@@ -80,15 +80,37 @@ function  extend(son,parent)
 * 返回值：升级版的子类,比如:A'=A.extend(B);
 * */
 Function.prototype.extend = function (parent) {
-  var p = parent || Object;
-  if (typeof p === 'function') {
-    var prototype=extend(this.prototype,p.prototype);
+  if(this._super)
+    {
+     throw new Error("超类已经存在，不可重复继承！");
+    }
+  var Parent = parent || Object;
+  if (typeof Parent === 'function') {
+  //生成升级版的子类构造函数
+    var Child=function(){
+        //调用父类的构造函数
+        if(Child._super&&Child._super.hasOwnProperty("constructor"))
+          {
+           Child._super.constructor.apply(this,arguments);
+          } 
+        //调用子类的构造函数
+        if(Child.prototype.hasOwnProperty("constructor"))
+         {
+          Child.prototype.constructor.apply(this,arguments);
+         }    
+    };    
+    var prototype=extend(this.prototype,Parent.prototype);
     //保存父类的原型
-    this._super=p.prototype;
-    //修改原型的constructor属性，为this
-    prototype.constructor = this;
-    this.prototype = prototype;
-    return this;
+    Object.defineProperty(Child,"_super",{
+    value:Parent.prototype,
+    writable:true,
+    enumerable:false,
+    configurable:false
+  });
+    //修改原型的constructor属性，为Child
+    prototype.constructor = Child;
+    Child.prototype = prototype;
+    return Child;
   } else {
     throw  new TypeError('参数：' + p + '类型不合法!');
   }
@@ -98,12 +120,13 @@ Function.prototype.extend = function (parent) {
  *实现接口的方法，参数是接口类型:
  *1:对象表示法，匿名接口，例如{update:null/*抽象方法*/，get:function(){}/*default方法*/}
  *2:函数表示法，function(){定义原型方法}
- *返回值：升级版的子类,比如:A'=A.implement(B).implement(C);
+ *返回值：升级版的子类,比如:A'=A.implement(B，C);
  */
-Function.prototype.implement = function (parent) {
-  /*
-   *在当前原型链上插入一个节点，位于this原型的前面
-   */
+Function.prototype.implement = function () {
+    for(var i=0;i<arguments.length;i++)
+     {
+      
+     }
     var son/*儿子*/,father/*父亲*/;
     var F/构造函数*/;
   if(typeof parent==='object')
