@@ -9,6 +9,32 @@
 
 /*定义一个命名空间函数*/
 var $$ = function(){};
+/*
+ *工具函数：通过对象获取对象的原型
+ */
+Object.prototype.getPrototype=function()
+{
+var prototype=null;
+if(Object.getPrototypeOf)
+   prototype=Object.getPrototypeOf(this);
+else if(this.constructor)
+   prototype=this.constructor.prototype;
+return prototype;
+};
+
+/*
+ *工具函数：通过对象在对象原型中添加方法
+ */
+Object.prototype.method=function(name,func){
+ if(typeof func!=="function")
+  throw new TypeError(func+":不是一个函数！");
+ var prototype=this.getPrototype();
+ //不允许重复添加
+ if(prototype && !prototype.hasOwnProperty(name))
+  prototype[name]=func;
+ else
+  throw new TypeError("添加函数:("+func+")失败！");
+};
 
 /*
  *克隆对象里面自定义的属性，参数是一个
@@ -96,30 +122,18 @@ Function.prototype.extend = function (parent) {
     }
   if (typeof Parent === 'function') {
   //生成升级版的子类构造函数
-    var Child=function(){
-        //调用父类的构造函数
-        if(Child._super&&Child._super.hasOwnProperty("constructor"))
-          {
-           Child._super.constructor.apply(this,arguments);
-          } 
-        //调用子类的构造函数
-        if(Child.prototype.hasOwnProperty("constructor"))
-         {
-          Child.prototype.constructor.apply(this,arguments);
-         }    
-    };    
     var prototype=extend(this.prototype,Parent.prototype);
     //保存父类的原型
-    Object.defineProperty(Child,"_super",{
+    Object.defineProperty(this,"_super",{
     value:Parent.prototype,
     writable:true,
     enumerable:false,
     configurable:false
   });
-    //修改原型的constructor属性，为Child
-    prototype.constructor = Child;
-    Child.prototype = prototype;
-    return Child;
+    //修改原型的constructor属性，为this
+    prototype.constructor = this;
+    this.prototype = prototype;
+    return this;
   } else {
     throw  new TypeError('参数：' + p + '类型不合法!');
   }
