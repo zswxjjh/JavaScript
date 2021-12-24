@@ -137,9 +137,11 @@ var Event=(function(){
           {
             var listener=this.listeners[key];
             if(listener.constructor==Function)
+              //注意回调函数没有主叫对象，可以自由绑定一个对象
               listener.apply(null,arguments);
             if(listener instanceof Object)
-              listener.update.apply(listener,arguments);
+              //注意主叫对象是监听器，比如视图
+              listener.handle.apply(listener,arguments);
           }               
        }
    };
@@ -149,20 +151,27 @@ var Event=(function(){
 *抽象监听者类：用于监听器模式
 */
 var Listener=(function(){
-    var Listener=function(){};
-    Listener.prototype.update=function(){};
+    var Listener=function(){
+      if(!this)
+        throw new Error("构造函数，不能当普通函数调用！")
+      if(this && this.constructor===Listener)
+        throw new Error("抽象接口，不能实例化！");
+    };
+    Listener.prototype.handle=function(){
+      throw new Error("抽象方法！");
+    };
     return Listener;
   }());
 
 /*
-*抽象模型类，实现基本功能，负责业务逻辑
-*表示表格数据
+*模型类，实现基本功能，负责业务逻辑
+*包含一组具有相同结构的数据
 */
 var  Model=(function(){
    //构造函数，key表示主键字段
    function Model(key)
     {
-      //存储表格数据
+      //存储相同结构的数据
       this.items=[];
       this.key=key;
       //事件
@@ -251,3 +260,21 @@ var  Model=(function(){
           this.onUpdate.notify({source:this,values:arguments});
       };
  }());
+
+/*
+ *视图接口:显示模型数据
+ */
+var View=(function(){
+ return {
+    //插入DOM节点
+    insert:function(){},
+    //删除DOM节点
+    remove:function(){},
+    //更新DOM节点
+    update:function(){},
+    //获取DOM数据
+    get:function(){},
+    //渲染视图到显示器
+    render:function(){},   
+  };
+}());
