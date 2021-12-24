@@ -9,6 +9,20 @@
 
 /*定义一个命名空间函数*/
 var $$ = function(){};
+
+/*
+ *在对象中通过prototype属性获取当前对象的原型
+ */
+Object.defineProperty(Object.prototype,{
+  //不可枚举
+  enumerable:false,
+  //不可删除
+  configurable:false,
+  get:function(){
+       return this.getPrototype();
+      }
+});
+
 /*
  *工具函数：通过对象获取对象的原型
  */
