@@ -148,26 +148,35 @@ var Event=(function(){
 }());
 
 /*
-*抽象监听者类：用于监听器模式
+*监听者接口：用于监听器模式
+*用对象表示接口
 */
 var Listener=(function(){
-    var Listener=function(){
-      if(!this)
-        throw new Error("构造函数，不能当普通函数调用！")
-      if(this && this.constructor===Listener)
-        throw new Error("抽象接口，不能实例化！");
-    };
-    Listener.prototype.handle=function(){
-      throw new Error("抽象方法！");
-    };
-    return Listener;
+    return {
+        handle:function(){
+          throw new Error("抽象方法！");
+        };
+      };
   }());
+
+/*
+ *模型接口:用于MVC模式的模型
+ */
+var Model=(function(){
+    return {
+     //CRUD操作
+     insert:function(){},
+     read:function(){},
+     update:function(){},
+     remove:function(){}
+    };
+ }());
 
 /*
 *模型类，实现基本功能，负责业务逻辑
 *包含一组具有相同结构的数据
 */
-var  Model=(function(){
+var  GridModel=(function(){
    //构造函数，key表示主键字段
    function Model(key)
     {
@@ -175,27 +184,26 @@ var  Model=(function(){
       this.items=[];
       this.key=key;
       //事件
-      this.onAdd=new Event();
+      this.onInsert=new Event();
       this.onRemove=new Event();
-      this.onGet=new Event();
       this.onUpdate=new Event();
     }
    /*
     *追加一个或者多个记录数据，可变参数，item集合
    */
-    Model.prototype.add=function()
+    GridModel.prototype.insert=function()
       {
         for(var i=0;i<arguments.length;i++)
          {
           this.items.push(arguments[i]);
          }
          //触发事件    
-          this.onAdd.notify({source:this,values:arguments});
+          this.onInsert.notify({source:this,values:arguments});
       };
     /*
      *删除一个或者多个记录，可变参数，key集合
      */
-    Model.prototype.remove=function()
+    GridModel.prototype.remove=function()
       {
         var values=this.get(arguments);
         var key=this.key;
@@ -220,7 +228,7 @@ var  Model=(function(){
     /*
      *查询一条或者多条记录，可变参数，key集合
      */
-    Model.prototype.get=function()
+    GridModel.prototype.read=function()
       {
         var result=[];
         for(var i=0;i<this.items.length;i++)
@@ -241,7 +249,7 @@ var  Model=(function(){
     /*
      *更新一条或者多条记录，可变参数,item集合
      */
-    Model.prototype.update=function()
+    GridModel.prototype.update=function()
       {
         var key=this.key;
         var items=this.items;
@@ -266,15 +274,23 @@ var  Model=(function(){
  */
 var View=(function(){
  return {
-    //插入DOM节点
-    insert:function(){},
-    //删除DOM节点
-    remove:function(){},
-    //更新DOM节点
+    //更新视图
     update:function(){},
-    //获取DOM数据
-    get:function(){},
-    //渲染视图到显示器
-    render:function(){},   
+    //渲染视图
+    render:function(){} 
   };
+}());
+
+/*
+ *控制器对象，单例
+ */
+var Controller=(function(){
+  var c={};  
+  //初始化，一般绑定事件，最好用事件委托方式
+  c.init=function(){};
+  //处理事件
+  c.on=function(event){};
+  //销毁控制器，比如移除事件处理器
+  c.destroy=function(){};
+  return c;
 }());
