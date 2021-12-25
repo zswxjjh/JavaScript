@@ -268,7 +268,6 @@ var Component=(function(){
   this.model=null;
  }
  //方法
- Component.prototype.init=null;
  Component.prototype.on=function(event){};
  Component.prototype.destroy=null;
  Component.prototype.update=null;
@@ -294,10 +293,8 @@ var Model=(function(){
  {
   
  }
- //CRUD操作
- Model.prototype.insert=null;
+ //操作
  Model.prototype.read=null;
- Model.prototype.remove=null;
  Model.prototype.update=null;
  }());
 
