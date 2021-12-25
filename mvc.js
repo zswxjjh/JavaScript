@@ -160,19 +160,6 @@ var Listener=(function(){
   }());
 
 /*
- *模型接口:用于MVC模式的模型
- */
-var Model=(function(){
-    return {
-     //CRUD操作
-     insert:function(){},
-     read:function(){},
-     update:function(){},
-     remove:function(){}
-    };
- }());
-
-/*
 *模型类，实现基本功能，负责业务逻辑
 *包含一组具有相同结构的数据
 */
@@ -270,27 +257,58 @@ var  GridModel=(function(){
  }());
 
 /*
- *视图接口:显示模型数据
+ *控制器接口描述
+ *@param selector 组件的边界
  */
-var View=(function(){
- return {
-    //更新视图
-    update:function(){},
-    //渲染视图
-    render:function(){} 
-  };
+var Component=(function(){
+ function Component(selector)
+ {
+  //属性
+  this.view=null;
+  this.model=null;
+ }
+ //方法
+ Component.prototype.init=null;
+ Component.prototype.on=function(event){};
+ Component.prototype.destroy=null;
+ Component.prototype.update=null;
 }());
 
 /*
- *控制器对象，单例
+ *视图接口描述:显示模型数据
  */
-var Controller=(function(){
-  var c={};  
-  //初始化，一般绑定事件，最好用事件委托方式
-  c.init=function(){};
-  //处理事件
-  c.on=function(event){};
-  //销毁控制器，比如移除事件处理器
-  c.destroy=function(){};
-  return c;
+var View=(function(){
+ function View()
+ {
+  
+ }
+ //方法
+ View.prototype.update=null;
+}());
+
+/*
+ *模型接口描述:用于MVC模式的模型
+ */
+var Model=(function(){
+ function Model()
+ {
+  
+ }
+ //CRUD操作
+ Model.prototype.insert=null;
+ Model.prototype.read=null;
+ Model.prototype.remove=null;
+ Model.prototype.update=null;
+ }());
+
+/*
+ *页面执行上下文接口描述:单例，也是一个控制器
+ */
+var Page=(function(){
+ var Page={};
+ //方法列表
+ Page.init=null;
+ Page.on=function(event){};
+ Page.destroy=null;
+ return Page;
 }());
