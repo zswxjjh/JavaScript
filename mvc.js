@@ -301,21 +301,69 @@ var View=(function(){
 var Model=(function(){
  function Model()
  {
-  this.onReaded=new Event();
-  this.onUpdated=new Event();
+  this.onUpdate=new Event();
+  this.onRead=new Event();
+  this.onRemove=new Event();
+  this.onCreate=new Event();
  }
- //操作
- Model.prototype.read=function(){
-  //使用代理完成实际Read操作
-  var item=this.proxy.read(arguments);
-  //触发监听器
-  this.onReaded.notify({source:this.proxy,data:item});
-  return item;
+ /*
+  *修改对象的属性
+  *@param obj 要修改的对象
+  *@param property 属性名，必须存在
+  *@param value 新的属性值
+  *@return value 返回新的值
+  */
+ Model.prototype.update=function(obj,property,value){
+  //如果obj为空，默认data
+  var o=obj || data;
+  o[property]=value;
+  this.onUpdate.notify({source:this,value:value});
+  return value;
  };
- Model.prototype.update=function(){
-  var item=this.proxy.update(arguments);
-  this.onUpdated.notify({source:this.proxy,data:item});
-  return item;
+  /*
+  *读取对象的属性
+  *@param obj 要修改的对象
+  *@param property 属性名，必须存在
+  *@return value 返回新的值
+  */
+ Model.prototype.read=function(obj,property){
+  //如果obj为空，默认data
+  var o=obj || data;
+  var value=o[property];
+  this.onRead.notify({source:this,value:value});
+  return value;
+ };
+  /*
+  *删除对象的属性
+  *@param obj 要修改的对象
+  *@param property 属性名，有可能是数组索引，必须存在
+  *@return 返回被删除的值
+  */
+ Model.prototype.remove=function(obj,property){
+  //如果obj为空，默认data
+  var o=obj || data;
+  var value=o[property];
+  //对象是数组
+  if(o.constructor===Array)
+    o.splice(property,1);
+  else
+    delete o[property];
+  this.onRead.notify({source:this,value:value});
+  return value;
+ };
+  /*
+  *创建对象的属性
+  *@param obj 要修改的对象
+  *@param property 属性名，必须不存在
+  *@param value  属性值
+  *@return value 返回新的值
+  */
+ Model.prototype.create=function(obj,property,value){
+  //如果obj为空，默认data
+  var o=obj || data;
+  o[property]=value;
+  this.onCreate.notify({source:this,value:value});
+  return value;
  };
  }());
 
