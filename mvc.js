@@ -269,8 +269,10 @@ var Component=(function(){
   this.view=new View(dElement);
   this.model=new Model();
   //绑定监听器
-  this.model.onReaded.addListener(this.view.read.bind(this.view));
-  this.model.onUpdated.addListener(this.view.update.bind(this.view));
+  this.model.onRead.addListener(this.view.read.bind(this.view));
+  this.model.onUpdate.addListener(this.view.update.bind(this.view));
+  this.model.onInsert.addListener(this.view.insert.bind(this.view));
+  this.model.onRemove.addListener(this.view.remove.bind(this.view));
   //注册事件委托
   var self=this;
   addEvent(dElement,"click",function(event){
@@ -278,6 +280,7 @@ var Component=(function(){
   });
  }
  //方法
+ Component.prototype.init=null;
  Component.prototype.on=function(event){};
  Component.prototype.destroy=null;
  Component.prototype.update=null;
@@ -287,12 +290,15 @@ var Component=(function(){
  *视图接口描述:显示模型数据
  */
 var View=(function(){
- function View()
+ function View(selector)
  {
   
  }
  //方法
  View.prototype.update=null;
+ View.prototype.read=null;
+ View.prototype.insert=null;
+ View.prototype.remove=null;
 }());
 
 /*
@@ -304,7 +310,7 @@ var Model=(function(){
   this.onUpdate=new Event();
   this.onRead=new Event();
   this.onRemove=new Event();
-  this.onCreate=new Event();
+  this.onInsert=new Event();
  }
  /*
   *修改对象的属性
@@ -358,7 +364,7 @@ var Model=(function(){
   *@param value  属性值
   *@return value 返回新的值
   */
- Model.prototype.create=function(obj,property,value){
+ Model.prototype.insert=function(obj,property,value){
   //如果obj为空，默认data
   var o=obj || data;
   o[property]=value;
