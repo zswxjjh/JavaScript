@@ -263,9 +263,19 @@ var  GridModel=(function(){
 var Component=(function(){
  function Component(selector)
  {
+  //视图边界DOM元素
+  var dElement=$(selector);
   //属性
-  this.view=null;
-  this.model=null;
+  this.view=new View(dElement);
+  this.model=new Model();
+  //绑定监听器
+  this.model.onReaded.addListener(this.view.read.bind(this.view));
+  this.model.onUpdated.addListener(this.view.update.bind(this.view));
+  //注册事件委托
+  var self=this;
+  addEvent(dElement,"click",function(event){
+    self.on(event);
+  });
  }
  //方法
  Component.prototype.on=function(event){};
@@ -291,11 +301,22 @@ var View=(function(){
 var Model=(function(){
  function Model()
  {
-  
+  this.onReaded=new Event();
+  this.onUpdated=new Event();
  }
  //操作
- Model.prototype.read=null;
- Model.prototype.update=null;
+ Model.prototype.read=function(){
+  //使用代理完成实际Read操作
+  var item=this.proxy.read(arguments);
+  //触发监听器
+  this.onReaded.notify({source:this.proxy,data:item});
+  return item;
+ };
+ Model.prototype.update=function(){
+  var item=this.proxy.update(arguments);
+  this.onUpdated.notify({source:this.proxy,data:item});
+  return item;
+ };
  }());
 
 /*
