@@ -303,10 +303,13 @@ var View=(function(){
 
 /*
  *模型接口描述:用于MVC模式的模型
+ *@param data  必须包含on属性，里面放置事件处理方法
  */
 var Model=(function(){
- function Model()
+ function Model(data)
  {
+  //数据，对应视图的状态和事件代码
+  this.data=data;
   this.onUpdate=new Event();
   this.onRead=new Event();
   this.onRemove=new Event();
@@ -314,41 +317,35 @@ var Model=(function(){
  }
  /*
   *修改对象的属性
-  *@param obj 要修改的对象
-  *@param property 属性名，必须存在
+  *@param path:string 用.分隔的，对象属性导航字符串
   *@param value 新的属性值
   *@return value 返回新的值
   */
- Model.prototype.update=function(obj,property,value){
-  //如果obj为空，默认data
-  var o=obj || data;
-  o[property]=value;
-  this.onUpdate.notify({source:this,value:value});
+ Model.prototype.update=function(path,value){
+  //如果path为空，默认data
+  var value=eval(path?("this.data."+path):"this.data");
+  this.onUpdate.notify({path:path,value:value});
   return value;
  };
   /*
   *读取对象的属性
-  *@param obj 要修改的对象
-  *@param property 属性名，必须存在
+  *@param path:string 用.分隔的，对象属性导航字符串
   *@return value 返回新的值
   */
- Model.prototype.read=function(obj,property){
-  //如果obj为空，默认data
-  var o=obj || data;
-  var value=o[property];
-  this.onRead.notify({source:this,value:value});
+ Model.prototype.read=function(path){
+  //如果path为空，默认data
+  var value=eval(path?("this.data."+path):"this.data");
+  this.onRead.notify({path:path,value:value});
   return value;
  };
   /*
   *删除对象的属性
-  *@param obj 要修改的对象
-  *@param property 属性名，有可能是数组索引，必须存在
+  *@param path:string 用.分隔的，对象属性导航字符串
   *@return 返回被删除的值
   */
- Model.prototype.remove=function(obj,property){
-  //如果obj为空，默认data
-  var o=obj || data;
-  var value=o[property];
+ Model.prototype.remove=function(path){
+  //如果path为空，默认data
+  var value=eval(path?("this.data."+path):"this.data");
   //对象是数组
   if(o.constructor===Array)
     o.splice(property,1);
@@ -359,12 +356,11 @@ var Model=(function(){
  };
   /*
   *创建对象的属性
-  *@param obj 要修改的对象
-  *@param property 属性名，必须不存在
+  *@param path:string 用.分隔的，对象属性导航字符串
   *@param value  属性值
   *@return value 返回新的值
   */
- Model.prototype.insert=function(obj,property,value){
+ Model.prototype.insert=function(path,value){
   //如果obj为空，默认data
   var o=obj || data;
   o[property]=value;
