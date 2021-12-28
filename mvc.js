@@ -296,7 +296,14 @@ var View=(function(){
  function $$(path)
  {
   //模式:匹配[""] 或者['']或者[数字]
-  var regx=/\[\]/;
+  var regx=/\\[(.+)\\]/ig;
+  var result;
+  while((result=regx.exec(path))!==null)
+  {
+   //捕获组匹配的内容
+   var text=result[1];
+   
+  }
  }
  function View(selector)
  {
