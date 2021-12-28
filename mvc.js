@@ -290,6 +290,14 @@ var Component=(function(){
  *视图接口描述:显示模型数据
  */
 var View=(function(){
+ /*
+  *定义一个解析path的函数，用以把path转化成元素
+  */
+ function $$(path)
+ {
+  //模式:匹配[""] 或者['']或者[数字]
+  var regx=/\[\]/;
+ }
  function View(selector)
  {
   
@@ -317,54 +325,64 @@ var Model=(function(){
  }
  /*
   *修改对象的属性
-  *@param path:string 用.分隔的，对象属性导航字符串
+  *@param path:string 用[]分隔的，对象属性导航字符串
   *@param value 新的属性值
   *@return value 返回新的值
   */
  Model.prototype.update=function(path,value){
-  //如果path为空，默认data
+  //如果path为空，默认this.data
   var value=eval(path?("this.data."+path):"this.data");
   this.onUpdate.notify({path:path,value:value});
   return value;
  };
   /*
   *读取对象的属性
-  *@param path:string 用.分隔的，对象属性导航字符串
+  *@param path:string 用[]分隔的对象属性导航字符串
   *@return value 返回新的值
   */
  Model.prototype.read=function(path){
-  //如果path为空，默认data
+  //如果path为空，默认this.data
   var value=eval(path?("this.data."+path):"this.data");
   this.onRead.notify({path:path,value:value});
   return value;
  };
   /*
-  *删除对象的属性
-  *@param path:string 用.分隔的，对象属性导航字符串
+  *删除对象的属性或者数组元素
+  *@param path:string 用[]分隔的对象属性导航字符串
+  *@param index?:number 可选参数，数组索性
   *@return 返回被删除的值
   */
- Model.prototype.remove=function(path){
-  //如果path为空，默认data
+ Model.prototype.remove=function(path,index){
+  //如果path为空，默认this.data
   var value=eval(path?("this.data."+path):"this.data");
   //对象是数组
-  if(o.constructor===Array)
-    o.splice(property,1);
+  if(value.constructor===Array && index)
+    {
+     value.splice(index,1);
+     path+="["+index+"]";
+    }
   else
-    delete o[property];
-  this.onRead.notify({source:this,value:value});
+    delete value;
+  this.onRead.notify({path:path,value:value});
   return value;
  };
   /*
-  *创建对象的属性
-  *@param path:string 用.分隔的，对象属性导航字符串
+  *创建对象的属性或者在数组中追加元素
+  *@param path:string 用[]分隔的对象属性导航字符串
   *@param value  属性值
+  *@param property:string | number 对象属性或者数组索引
   *@return value 返回新的值
   */
- Model.prototype.insert=function(path,value){
-  //如果obj为空，默认data
-  var o=obj || data;
-  o[property]=value;
-  this.onCreate.notify({source:this,value:value});
+ Model.prototype.insert=function(path,property,value){
+  //如果path为空，默认this.data
+  var obj=eval(path?("this.data."+path):"this.data");
+  //对象是数组
+  if(obj.constructor===Array && typeof property==="number")
+    {
+     path+="["+property+"]";
+    }
+  obj[property]=value;
+  this.onInsert.notify({path:path,name:property,value:value});
   return value;
  };
  }());
