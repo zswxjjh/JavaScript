@@ -415,8 +415,8 @@ var Model=(function(){
   if(obj.constructor===Array && typeof property==="number")
     {
      property=property || obj.length;
-     path+="["+property+"]";
     }
+  path+="["+property+"]";
   obj[property]=value;
   this.onInsert.notify({path:path,name:property,value:value});
   return value;
