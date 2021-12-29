@@ -292,17 +292,45 @@ var Component=(function(){
 var View=(function(){
  /*
   *定义一个解析path的函数，用以把path转化成元素
+  *@param path:string 用于定位元素的路径
+  *@param ele:HTMLElement HTML元素，范围
   */
- function $$(path)
+ function $$(path,ele)
  {
   //模式:匹配[""] 或者['']或者[数字]
   var regx=/\\[(.+)\\]/ig;
-  var result;
+  var result;//模式匹配的结果
+  var current=ele;//当前路径上的元素
   while((result=regx.exec(path))!==null)
   {
    //捕获组匹配的内容
-   var text=result[1];
-   
+   var groupText=result[1];
+   //匹配的子字符串(子路径)
+   var childPath=result[0];
+   //下一次开始匹配的位置索引
+   var nextIndex=regx.lastIndex;
+   //以单引号或者双引号开头
+   if(groupText.indexOf('"')===0 || groupText.indexOf("'")===0)
+    {
+     //去掉单引号和双引号
+     groupText=groupText.substring(1,groupText.length-1);
+     //作为id查询
+     var ret=current.querySelectorAll("#"+groupText);
+     if(ret && ret.length===0)
+      //作为类选择符尝试
+      ret=current.querySelectorAll("."+groupText);
+     if(ret && ret.length===0)
+      //作为name属性选择符
+      ret=current.querySelectorAll("[name='"+groupText+"']");
+     if(ret && ret.length===0)//作为元素属性名
+      
+     if(ret.length===0)//没找到
+      throw new Error(path+":非法路径!");
+     else if(nextIndex<path.length-1)//未匹配完
+      {
+       current
+      }
+    }
   }
  }
  function View(selector)
@@ -377,15 +405,16 @@ var Model=(function(){
   *创建对象的属性或者在数组中追加元素
   *@param path:string 用[]分隔的对象属性导航字符串
   *@param value  属性值
-  *@param property:string | number 对象属性或者数组索引
+  *@param property?:string | number 可选，对象属性或者数组索引
   *@return value 返回新的值
   */
- Model.prototype.insert=function(path,property,value){
+ Model.prototype.insert=function(path,value,property){
   //如果path为空，默认this.data
   var obj=eval(path?("this.data."+path):"this.data");
   //对象是数组
   if(obj.constructor===Array && typeof property==="number")
     {
+     property=property || obj.length;
      path+="["+property+"]";
     }
   obj[property]=value;
