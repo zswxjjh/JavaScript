@@ -323,15 +323,27 @@ var View=(function(){
       //作为name属性选择符
       ret=current.querySelectorAll("[name='"+groupText+"']");
      if(ret && ret.length===0)//作为元素属性名
-      
-     if(ret.length===0)//没找到
+       {
+        ret=current.getAttributeNode(groupText);
+        if(ret && nextIndex<path.length-1)//属性只能是终端节点
+         throw new Error(ret+":属性名，只能在路径的终端！");
+       }
+     if(!ret || ret.length===0)//没找到
       throw new Error(path+":非法路径!");
-     else if(nextIndex<path.length-1)//未匹配完
-      {
-       current
-      }
     }
+   //groupText是一个数字索性
+   else if(/[0-9]+/gi.test(groupText))
+    {
+     ret=current[parseInt(groupText)];
+    }    
+   //进行下一次匹配
+   if(ret && (ret instanceof NodeList) && nextIndex<path.length-1)//未匹配完
+    {
+       current=ret[0];
+    }
+   current=ret;
   }
+  return current;
  }
  function View(selector)
  {
