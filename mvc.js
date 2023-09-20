@@ -155,7 +155,7 @@ var Listener=(function(){
     return {
         handle:function(){
           throw new Error("抽象方法！");
-        };
+        }
       };
   }());
 
